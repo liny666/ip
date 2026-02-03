@@ -1,7 +1,8 @@
 import java.util.Scanner;
 
 public class GoGoGoose {
-    private static final String DIVIDER_LINE = "____________________________________________________________";
+    private static final String DIVIDER_LINE =
+            "____________________________________________________________";
 
     public static void main(String[] args) {
         Scanner inputScanner = new Scanner(System.in);
@@ -16,7 +17,6 @@ public class GoGoGoose {
 
         while (true) {
             String userInput = inputScanner.nextLine().trim();
-
             System.out.println(DIVIDER_LINE);
 
             if (userInput.equals("bye")) {
@@ -35,32 +35,62 @@ public class GoGoGoose {
             }
 
             if (userInput.startsWith("mark ")) {
-                int taskIndex = Integer.parseInt(userInput.split(" ")[1]) - 1;
-                if (taskIndex >= 0 && taskIndex < taskCount) {
-                    tasks[taskIndex].markAsDone();
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.println("  " + tasks[taskIndex]);
-                }
+                int index = Integer.parseInt(userInput.split(" ")[1]) - 1;
+                tasks[index].markAsDone();
+                System.out.println("Nice! I've marked this task as done:");
+                System.out.println("  " + tasks[index]);
                 System.out.println(DIVIDER_LINE);
                 continue;
             }
 
             if (userInput.startsWith("unmark ")) {
-                int taskIndex = Integer.parseInt(userInput.split(" ")[1]) - 1;
-                if (taskIndex >= 0 && taskIndex < taskCount) {
-                    tasks[taskIndex].unmarkAsDone();
-                    System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println("  " + tasks[taskIndex]);
-                }
+                int index = Integer.parseInt(userInput.split(" ")[1]) - 1;
+                tasks[index].unmarkAsDone();
+                System.out.println("OK, I've marked this task as not done yet:");
+                System.out.println("  " + tasks[index]);
                 System.out.println(DIVIDER_LINE);
                 continue;
             }
 
-            tasks[taskCount] = new Task(userInput);
-            taskCount++;
+            if (userInput.startsWith("todo ")) {
+                String description = userInput.substring(5);
+                tasks[taskCount++] = new Todo(description);
 
-            System.out.println("added: " + userInput);
-            System.out.println(DIVIDER_LINE);
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + tasks[taskCount - 1]);
+                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                System.out.println(DIVIDER_LINE);
+                continue;
+            }
+
+            if (userInput.startsWith("deadline ")) {
+                String[] parts = userInput.substring(9).split(" /by ", 2);
+                String description = parts[0];
+                String by = parts[1];
+
+                tasks[taskCount++] = new Deadline(description, by);
+
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + tasks[taskCount - 1]);
+                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                System.out.println(DIVIDER_LINE);
+                continue;
+            }
+
+            if (userInput.startsWith("event ")) {
+                String[] parts = userInput.substring(6).split(" /from | /to ");
+                String description = parts[0];
+                String from = parts[1];
+                String to = parts[2];
+
+                tasks[taskCount++] = new Event(description, from, to);
+
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + tasks[taskCount - 1]);
+                System.out.println("Now you have " + taskCount + " tasks in the list.");
+                System.out.println(DIVIDER_LINE);
+                continue;
+            }
         }
 
         inputScanner.close();
