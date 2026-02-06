@@ -1,6 +1,10 @@
 import java.util.Scanner;
 
 public class GoGoGoose {
+    private static final int TODO_CMD_LENGTH = 5;
+    private static final int DEADLINE_CMD_LENGTH = 9;
+    private static final int EVENT_CMD_LENGTH = 6;
+
     private static final String DIVIDER_LINE =
             "____________________________________________________________";
 
@@ -53,7 +57,7 @@ public class GoGoGoose {
             }
 
             if (userInput.startsWith("todo ")) {
-                String description = userInput.substring(5);
+                String description = userInput.substring(TODO_CMD_LENGTH);
                 tasks[taskCount++] = new Todo(description);
 
                 System.out.println("Got it. I've added this task:");
@@ -64,7 +68,7 @@ public class GoGoGoose {
             }
 
             if (userInput.startsWith("deadline ")) {
-                String[] parts = userInput.substring(9).split(" /by ", 2);
+                String[] parts = userInput.substring(DEADLINE_CMD_LENGTH).split(" /by ", 2);
                 String description = parts[0];
                 String by = parts[1];
 
@@ -78,7 +82,7 @@ public class GoGoGoose {
             }
 
             if (userInput.startsWith("event ")) {
-                String[] parts = userInput.substring(6).split(" /from | /to ");
+                String[] parts = userInput.substring(EVENT_CMD_LENGTH).split(" /from | /to ");
                 String description = parts[0];
                 String from = parts[1];
                 String to = parts[2];
