@@ -5,7 +5,7 @@ public class GoGoGoose {
     private static final String COMMAND_LIST = "list";
     private static final String COMMAND_MARK = "mark ";
     private static final String COMMAND_UNMARK = "unmark ";
-    private static final String COMMAND_TODO = "todo ";
+    private static final String COMMAND_TODO = "todo";
     private static final String COMMAND_DEADLINE = "deadline ";
     private static final String COMMAND_EVENT = "event ";
 
@@ -55,19 +55,32 @@ public class GoGoGoose {
         System.out.println(DIVIDER_LINE);
     }
 
-    private static void handleMarkCommand(String userInput, Task[] tasks) {
-        int index = Integer.parseInt(userInput.split(" ")[1]) - 1;
-        tasks[index].markAsDone();
+    private static void handleMarkCommand(String userInput, Task[] tasks) throws GooseException {
+        try {
+            int index = Integer.parseInt(userInput.split(" ")[1]) - 1;
 
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + tasks[index]);
-        System.out.println(DIVIDER_LINE);
+            if (index < 0 || index >= tasks.length || tasks[index] == null) {
+                throw new GooseException("Quack!! Task number invalid or does not exist.");
+            }
+
+            tasks[index].markAsDone();
+            System.out.println("Nice! I've marked this task as done:");
+            System.out.println("  " + tasks[index]);
+            System.out.println(DIVIDER_LINE);
+
+        } catch (NumberFormatException e) {
+            throw new GooseException("Quack!! Please provide a valid number. Example: mark 2");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new GooseException("Quack!! Task number missing.");
+        }
     }
 
-    private static int handleTodoCommand(String userInput, Task[] tasks, int taskCount) {
-        String description = userInput.substring(COMMAND_TODO.length());
+    private static int handleTodoCommand(String userInput, Task[] tasks, int taskCount) throws GooseException{
+        String description = userInput.substring(COMMAND_TODO.length()).trim();
+        if (description.isEmpty()) {
+            throw new GooseException("Quack!! todo cannot be empty and needs a description.");
+        }
         return addTask(tasks, taskCount, new Todo(description));
-
     }
 
     private static void handleUnmarkCommand(String userInput, Task[] tasks) {
@@ -93,7 +106,7 @@ public class GoGoGoose {
         return addTask(tasks, taskCount, task);
     }
 
-    private static int handleCommand(String userInput, Task[] tasks, int taskCount) {
+    private static int handleCommand(String userInput, Task[] tasks, int taskCount) throws GooseException{
         if (userInput.equals(COMMAND_LIST)) {
             handleListCommand(tasks, taskCount);
             return taskCount;
@@ -110,7 +123,8 @@ public class GoGoGoose {
         } else if (userInput.startsWith(COMMAND_EVENT)) {
             return handleEventCommand(userInput, tasks, taskCount);
         }
-        return taskCount;
+
+        throw new GooseException("Quack!! Type something that I can understand.");
     }
 
     public static void main(String[] args) {
@@ -130,8 +144,15 @@ public class GoGoGoose {
                 break;
             }
 
-            taskCount = handleCommand(userInput, tasks, taskCount);
-
+            try {
+                taskCount = handleCommand(userInput, tasks, taskCount);
+            } catch (GooseException e) {
+                System.out.println(e.getMessage());
+                System.out.println(DIVIDER_LINE);
+            } catch (Exception e) {
+                System.out.println("Quack!! An unexpected error occurred. Check your input.");
+                System.out.println(DIVIDER_LINE);
+            }
         }
         inputScanner.close();
     }
