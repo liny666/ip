@@ -1,3 +1,5 @@
+package Goose;
+
 public class Task {
     private String description;
     private boolean isDone;
