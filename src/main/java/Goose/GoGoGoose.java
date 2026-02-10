@@ -1,3 +1,5 @@
+package Goose;
+
 import java.util.Scanner;
 
 public class GoGoGoose {
@@ -78,7 +80,7 @@ public class GoGoGoose {
         }
     }
 
-    private static int handleTodoCommand(String userInput, Task[] tasks, int taskCount) throws GooseException{
+    private static int handleTodoCommand(String userInput, Task[] tasks, int taskCount) throws GooseException {
         String description = userInput.substring(COMMAND_TODO.length()).trim();
         if (description.isEmpty()) {
             throw new GooseException("Quack!! todo cannot be empty and needs a description.");
@@ -86,7 +88,7 @@ public class GoGoGoose {
         return addTask(tasks, taskCount, new Todo(description));
     }
 
-    private static void handleUnmarkCommand(String userInput, Task[] tasks) throws GooseException{
+    private static void handleUnmarkCommand(String userInput, Task[] tasks) throws GooseException {
         String[] parts = userInput.split(" ");
         if (parts.length < 2) {
             throw new GooseException("Quack!! Task number missing.");
@@ -135,7 +137,7 @@ public class GoGoGoose {
         return addTask(tasks, taskCount, task);
     }
 
-    private static int handleEventCommand(String userInput, Task[] tasks, int taskCount) throws GooseException{String remaining = userInput.substring(COMMAND_EVENT.length()).trim();
+    private static int handleEventCommand(String userInput, Task[] tasks, int taskCount) throws GooseException {String remaining = userInput.substring(COMMAND_EVENT.length()).trim();
         if (remaining.isEmpty() || remaining.startsWith("/from") || remaining.startsWith("/to")) {
             throw new GooseException("Quack!! Event description cannot be empty.");
         }
@@ -168,7 +170,7 @@ public class GoGoGoose {
         return addTask(tasks, taskCount, task);
     }
 
-    private static int handleCommand(String userInput, Task[] tasks, int taskCount) throws GooseException{
+    private static int handleCommand(String userInput, Task[] tasks, int taskCount) throws GooseException {
         if (userInput.equals(COMMAND_LIST)) {
             handleListCommand(tasks, taskCount);
             return taskCount;
