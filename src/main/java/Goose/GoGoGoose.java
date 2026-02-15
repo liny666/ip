@@ -92,12 +92,12 @@ public class GoGoGoose {
         System.out.println(DIVIDER_LINE);
     }
 
-    private static int handleTodoCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+    private static void handleTodoCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
         String description = userInput.substring(COMMAND_TODO.length()).trim();
         if (description.isEmpty()) {
             throw new GooseException("Quack!! todo cannot be empty and needs a description.");
         }
-        return addTask(tasks, new Todo(description));
+        addTask(tasks, new Todo(description));
     }
 
     private static String[] parseDeadlineInput(String userInput) throws GooseException {
@@ -122,10 +122,10 @@ public class GoGoGoose {
         return new String[]{description, by};
     }
 
-    private static int handleDeadlineCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+    private static void handleDeadlineCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
         String[] deadlineData = parseDeadlineInput(userInput);
         Deadline deadlineTask = new Deadline(deadlineData[0], deadlineData[1]);
-        return addTask(tasks, deadlineTask);
+        addTask(tasks, deadlineTask);
     }
 
     private static String[] parseEventInput(String userInput) throws GooseException {
@@ -160,10 +160,10 @@ public class GoGoGoose {
         return new Event(eventData[0], eventData[1], eventData[2]);
     }
 
-    private static int handleEventCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+    private static void handleEventCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
         String[] eventData = parseEventInput(userInput);
         Event eventTask = createEvent(eventData);
-        return addTask(tasks, eventTask);
+        addTask(tasks, eventTask);
     }
 
     private static void handleDeleteCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
@@ -176,28 +176,24 @@ public class GoGoGoose {
         System.out.println(DIVIDER_LINE);
     }
 
-    private static int handleCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+    private static void handleCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
         if (userInput.equals(COMMAND_LIST)) {
             handleListCommand(tasks);
-            return tasks.size();
         } else if (userInput.startsWith(COMMAND_MARK)) {
             handleMarkCommand(userInput, tasks);
-            return tasks.size();
         } else if (userInput.startsWith(COMMAND_UNMARK)) {
             handleUnmarkCommand(userInput, tasks);
-            return tasks.size();
         } else if (userInput.startsWith(COMMAND_TODO)) {
-            return handleTodoCommand(userInput, tasks);
+            handleTodoCommand(userInput, tasks);
         } else if (userInput.startsWith(COMMAND_DEADLINE)) {
-            return handleDeadlineCommand(userInput, tasks);
+            handleDeadlineCommand(userInput, tasks);
         } else if (userInput.startsWith(COMMAND_EVENT)) {
-            return handleEventCommand(userInput, tasks);
+            handleEventCommand(userInput, tasks);
         }else if (userInput.startsWith(COMMAND_DELETE)) {
             handleDeleteCommand(userInput, tasks);
-            return tasks.size();
+        }else {
+            throw new GooseException("Quack!! Type something that I can understand.");
         }
-
-        throw new GooseException("Quack!! Type something that I can understand.");
     }
 
     private static ArrayList<Task> loadTasksFromFile() {
