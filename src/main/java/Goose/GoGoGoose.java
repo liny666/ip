@@ -63,29 +63,41 @@ public class GoGoGoose {
         System.out.println(DIVIDER_LINE);
     }
 
-    private static void handleMarkCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+    private static int parseTaskIndex(String userInput, ArrayList<Task> tasks, String commandName) throws GooseException {
         String[] parts = userInput.split(" ");
         if (parts.length < 2) {
-            throw new GooseException("Quack!! Task number missing. Example: mark 2");
+            throw new GooseException("Quack!! Task number missing. Example: " + commandName + " 2");
         }
 
         try {
             int index = Integer.parseInt(parts[1]) - 1;
-
             if (index < 0 || index >= tasks.size()) {
                 throw new GooseException("Quack!! Task number invalid or does not exist.");
             }
-
-            tasks.get(index).markAsDone();
-
-            saveTasksToFile(tasks);
-            System.out.println("Nice! I've marked this task as done:");
-            System.out.println("  " + tasks.get(index));
-            System.out.println(DIVIDER_LINE);
-
+            return index;
         } catch (NumberFormatException e) {
             throw new GooseException("Quack!! Please provide a valid number.");
         }
+    }
+
+    private static void handleMarkCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+        int index = parseTaskIndex(userInput, tasks, COMMAND_MARK);  // parse + validate
+        Task task = tasks.get(index);
+        task.markAsDone();
+        saveTasksToFile(tasks);
+        System.out.println("Nice! I've marked this task as done:");
+        System.out.println("  " + task);
+        System.out.println(DIVIDER_LINE);
+    }
+
+    private static void handleUnmarkCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+        int index = parseTaskIndex(userInput, tasks, COMMAND_UNMARK); // parse + validate
+        Task task = tasks.get(index);
+        task.unmarkAsDone(); // unmark task
+        saveTasksToFile(tasks);
+        System.out.println("OK, I've marked this task as not done yet:");
+        System.out.println("  " + task);
+        System.out.println(DIVIDER_LINE);
     }
 
     private static int handleTodoCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
@@ -96,32 +108,7 @@ public class GoGoGoose {
         return addTask(tasks, new Todo(description));
     }
 
-    private static void handleUnmarkCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
-        String[] parts = userInput.split(" ");
-        if (parts.length < 2) {
-            throw new GooseException("Quack!! Task number missing.");
-        }
-
-        try {
-            int index = Integer.parseInt(parts[1]) - 1;
-
-            if (index < 0 || index >= tasks.size()) {
-                throw new GooseException("Quack!! Task number invalid or does not exist.");
-            }
-
-            tasks.get(index).unmarkAsDone();
-
-            saveTasksToFile(tasks);
-            System.out.println("OK, I've marked this task as not done yet:");
-            System.out.println("  " + tasks.get(index));
-            System.out.println(DIVIDER_LINE);
-
-        } catch (NumberFormatException e) {
-            throw new GooseException("Quack!! Please provide a valid number.");
-        }
-    }
-
-    private static int handleDeadlineCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+    private static String[] parseDeadlineInput(String userInput) throws GooseException {
         String remaining = userInput.substring(COMMAND_DEADLINE.length()).trim();
 
         if (remaining.isEmpty()) {
@@ -129,26 +116,29 @@ public class GoGoGoose {
         }
 
         String[] parts = remaining.split("/by", 2);
-
         String description = parts[0].trim();
         String by = (parts.length > 1) ? parts[1].trim() : "";
 
         if (description.isEmpty() && by.isEmpty()) {
             throw new GooseException("Quack!! Deadline description and /by date cannot be empty.");
-        }
-        else if (description.isEmpty()) {
+        } else if (description.isEmpty()) {
             throw new GooseException("Quack!! Deadline description cannot be empty.");
-        }
-        else if (by.isEmpty()) {
+        } else if (by.isEmpty()) {
             throw new GooseException("Quack!! Deadline /by date cannot be empty.");
         }
 
-        Deadline task = new Deadline(description, by);
-        return addTask(tasks, task);
+        return new String[]{description, by};
     }
 
-    private static int handleEventCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+    private static int handleDeadlineCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+        String[] deadlineData = parseDeadlineInput(userInput);  // parse + validate
+        Deadline deadlineTask = new Deadline(deadlineData[0], deadlineData[1]); // create object
+        return addTask(tasks, deadlineTask); // add task
+    }
+
+    private static String[] parseEventInput(String userInput) throws GooseException {
         String remaining = userInput.substring(COMMAND_EVENT.length()).trim();
+
         if (remaining.isEmpty() || remaining.startsWith("/from") || remaining.startsWith("/to")) {
             throw new GooseException("Quack!! Event description cannot be empty.");
         }
@@ -156,9 +146,7 @@ public class GoGoGoose {
         String[] firstSplit = remaining.split(" /from ", 2);
         String description = firstSplit[0].trim();
 
-        if (description.isEmpty()) {
-            throw new GooseException("Quack!! Event description cannot be empty.");
-        }
+        if (description.isEmpty()) throw new GooseException("Quack!! Event description cannot be empty.");
 
         if (firstSplit.length < 2 || firstSplit[1].trim().isEmpty()) {
             throw new GooseException("Quack!! Event start time after /from cannot be empty.");
@@ -166,44 +154,34 @@ public class GoGoGoose {
 
         String[] secondSplit = firstSplit[1].split(" /to ", 2);
         String from = secondSplit[0].trim();
-
-        if (from.isEmpty()) {
-            throw new GooseException("Quack!! Event start time after /from cannot be empty.");
-        }
+        if (from.isEmpty()) throw new GooseException("Quack!! Event start time after /from cannot be empty.");
 
         if (secondSplit.length < 2 || secondSplit[1].trim().isEmpty()) {
             throw new GooseException("Quack!! Event end time after /to cannot be empty.");
         }
 
         String to = secondSplit[1].trim();
+        return new String[]{description, from, to};
+    }
 
-        Event task = new Event(description, from, to);
-        return addTask(tasks, task);
+    private static Event createEvent(String[] eventData) {
+        return new Event(eventData[0], eventData[1], eventData[2]);
+    }
+
+    private static int handleEventCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+        String[] eventData = parseEventInput(userInput);
+        Event eventTask = createEvent(eventData);
+        return addTask(tasks, eventTask);
     }
 
     private static void handleDeleteCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
-        String[] parts = userInput.split(" ");
-        if (parts.length < 2) {
-            throw new GooseException("Quack!! Task number missing. Example: delete 2");
-        }
-
-        try {
-            int index = Integer.parseInt(parts[1]) - 1;
-            if (index < 0 || index >= tasks.size()) {
-                throw new GooseException("Quack!! Task number invalid or does not exist.");
-            }
-
-            Task removed = tasks.remove(index);
-
-            saveTasksToFile(tasks);
-            System.out.println("Noted. I've removed this task:");
-            System.out.println("  " + removed);
-            System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-            System.out.println(DIVIDER_LINE);
-
-        } catch (NumberFormatException e) {
-            throw new GooseException("Quack!! Please provide a valid number.");
-        }
+        int index = parseTaskIndex(userInput, tasks, COMMAND_DELETE); // parse + validate
+        Task removedTask = tasks.remove(index); // remove task
+        saveTasksToFile(tasks);
+        System.out.println("Noted. I've removed this task:");
+        System.out.println("  " + removedTask);
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+        System.out.println(DIVIDER_LINE);
     }
 
     private static int handleCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
@@ -233,12 +211,12 @@ public class GoGoGoose {
     private static ArrayList<Task> loadTasksFromFile() {
         ArrayList<Task> tasks = new ArrayList<>();
         try {
-            File file = new File(FILE_PATH);
-            File folder = file.getParentFile();
-            if (!folder.exists()) folder.mkdirs();
-            if (!file.exists()) file.createNewFile();
+            File taskFile = new File(FILE_PATH);
+            File taskFolder = taskFile.getParentFile();
+            if (!taskFolder.exists()) taskFolder.mkdirs();
+            if (!taskFile.exists()) taskFile.createNewFile();
 
-            Scanner fileScanner = new Scanner(file);
+            Scanner fileScanner = new Scanner(taskFile);
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine().trim();
                 if (line.isEmpty()) continue;
@@ -282,11 +260,11 @@ public class GoGoGoose {
 
     private static void saveTasksToFile(ArrayList<Task> tasks) {
         try {
-            File file = new File(FILE_PATH);
-            File folder = file.getParentFile();
-            if (!folder.exists()) folder.mkdirs();
+            File taskFile = new File(FILE_PATH);
+            File taskFolder = taskFile.getParentFile();
+            if (!taskFolder.exists()) taskFolder.mkdirs();
 
-            PrintWriter writer = new PrintWriter(file);
+            PrintWriter writer = new PrintWriter(taskFile);
             for (Task t : tasks) {
                 String line = "";
                 if (t instanceof Todo) {
