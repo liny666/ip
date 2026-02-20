@@ -2,6 +2,9 @@ package Goose;
 
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.PrintWriter;
+
 
 public class GoGoGoose {
     private static final String COMMAND_BYE = "bye";
@@ -11,6 +14,7 @@ public class GoGoGoose {
     private static final String COMMAND_TODO = "todo";
     private static final String COMMAND_DEADLINE = "deadline";
     private static final String COMMAND_EVENT = "event";
+    private static final String FILE_PATH = "./data/goose.txt";
     private static final String COMMAND_DELETE = "delete";
 
 
@@ -26,6 +30,7 @@ public class GoGoGoose {
 
     private static int addTask(ArrayList<Task> tasks, Task task) {
         tasks.add(task);
+        saveTasksToFile(tasks);
         printTaskAdded(task, tasks.size());
         return tasks.size();
     }
@@ -72,6 +77,8 @@ public class GoGoGoose {
             }
 
             tasks.get(index).markAsDone();
+
+            saveTasksToFile(tasks);
             System.out.println("Nice! I've marked this task as done:");
             System.out.println("  " + tasks.get(index));
             System.out.println(DIVIDER_LINE);
@@ -103,6 +110,8 @@ public class GoGoGoose {
             }
 
             tasks.get(index).unmarkAsDone();
+
+            saveTasksToFile(tasks);
             System.out.println("OK, I've marked this task as not done yet:");
             System.out.println("  " + tasks.get(index));
             System.out.println(DIVIDER_LINE);
@@ -185,6 +194,8 @@ public class GoGoGoose {
             }
 
             Task removed = tasks.remove(index);
+
+            saveTasksToFile(tasks);
             System.out.println("Noted. I've removed this task:");
             System.out.println("  " + removed);
             System.out.println("Now you have " + tasks.size() + " tasks in the list.");
@@ -212,17 +223,93 @@ public class GoGoGoose {
         } else if (userInput.startsWith(COMMAND_EVENT)) {
             return handleEventCommand(userInput, tasks);
         }else if (userInput.startsWith(COMMAND_DELETE)) {
-                handleDeleteCommand(userInput, tasks);
-                return tasks.size();
+            handleDeleteCommand(userInput, tasks);
+            return tasks.size();
         }
 
         throw new GooseException("Quack!! Type something that I can understand.");
     }
 
+    private static ArrayList<Task> loadTasksFromFile() {
+        ArrayList<Task> tasks = new ArrayList<>();
+        try {
+            File file = new File(FILE_PATH);
+            File folder = file.getParentFile();
+            if (!folder.exists()) folder.mkdirs();
+            if (!file.exists()) file.createNewFile();
+
+            Scanner fileScanner = new Scanner(file);
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine().trim();
+                if (line.isEmpty()) continue;
+
+                String[] parts = line.split(" \\| ");
+                String type = parts[0];
+                boolean isDone = parts[1].equals("1");
+                String description = parts[2];
+
+                switch (type) {
+                case "T":
+                    Todo todo = new Todo(description);
+                    if (isDone) todo.markAsDone();
+                    tasks.add(todo);
+                    break;
+                case "D":
+                    String by = parts.length > 3 ? parts[3] : "";
+                    Deadline deadline = new Deadline(description, by);
+                    if (isDone) deadline.markAsDone();
+                    tasks.add(deadline);
+                    break;
+                case "E":
+                    String fromTo = parts.length > 3 ? parts[3] : "";
+                    String[] fromToSplit = fromTo.split(" to ");
+                    String from = fromToSplit.length > 0 ? fromToSplit[0] : "";
+                    String to = fromToSplit.length > 1 ? fromToSplit[1] : "";
+                    Event event = new Event(description, from, to);
+                    if (isDone) event.markAsDone();
+                    tasks.add(event);
+                    break;
+                default:
+                    System.out.println("Warning: Unknown task type in file: " + line);
+                }
+            }
+            fileScanner.close();
+        } catch (Exception e) {
+            System.out.println("Warning: Could not load tasks from file. Starting with empty list.");
+        }
+        return tasks;
+    }
+
+    private static void saveTasksToFile(ArrayList<Task> tasks) {
+        try {
+            File file = new File(FILE_PATH);
+            File folder = file.getParentFile();
+            if (!folder.exists()) folder.mkdirs();
+
+            PrintWriter writer = new PrintWriter(file);
+            for (Task t : tasks) {
+                String line = "";
+                if (t instanceof Todo) {
+                    line = "T | " + (t.getStatusIcon().equals("X") ? "1" : "0") + " | " + ((Todo) t).getDescription();
+                } else if (t instanceof Deadline) {
+                    line = "D | " + (t.getStatusIcon().equals("X") ? "1" : "0") + " | "
+                            + ((Deadline) t).getDescription() + " | " + ((Deadline) t).getBy();
+                } else if (t instanceof Event) {
+                    line = "E | " + (t.getStatusIcon().equals("X") ? "1" : "0") + " | "
+                            + ((Event) t).getDescription() + " | " + ((Event) t).getFrom() + " to " + ((Event) t).getTo();
+                }
+                writer.println(line);
+            }
+            writer.close();
+        } catch (Exception e) {
+            System.out.println("Warning: Could not save tasks to file.");
+        }
+    }
+
+
     public static void main(String[] args) {
         Scanner inputScanner = new Scanner(System.in);
-
-        ArrayList<Task> tasks = new ArrayList<>();
+        ArrayList<Task> tasks = loadTasksFromFile();
 
         printWelcomeMessage();
 
