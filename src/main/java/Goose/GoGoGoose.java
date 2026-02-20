@@ -276,7 +276,6 @@ public class GoGoGoose {
         }
     }
 
-
     public static void main(String[] args) {
         Scanner inputScanner = new Scanner(System.in);
         ArrayList<Task> tasks = loadTasksFromFile();
