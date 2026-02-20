@@ -35,14 +35,6 @@ public class GoGoGoose {
         return tasks.size();
     }
 
-    private static Deadline parseDeadline(String userInput) {
-        String[] parts = userInput
-                .substring(COMMAND_DEADLINE.length())
-                .split(" /by ", 2);
-
-        return new Deadline(parts[0], parts[1]);
-    }
-
     private static void printWelcomeMessage() {
         System.out.println(DIVIDER_LINE);
         System.out.println("Hello! I'm GoGoGoose");
@@ -93,7 +85,7 @@ public class GoGoGoose {
     private static void handleUnmarkCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
         int index = parseTaskIndex(userInput, tasks, COMMAND_UNMARK); // parse + validate
         Task task = tasks.get(index);
-        task.unmarkAsDone(); // unmark task
+        task.unmarkAsDone();
         saveTasksToFile(tasks);
         System.out.println("OK, I've marked this task as not done yet:");
         System.out.println("  " + task);
@@ -131,9 +123,9 @@ public class GoGoGoose {
     }
 
     private static int handleDeadlineCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
-        String[] deadlineData = parseDeadlineInput(userInput);  // parse + validate
-        Deadline deadlineTask = new Deadline(deadlineData[0], deadlineData[1]); // create object
-        return addTask(tasks, deadlineTask); // add task
+        String[] deadlineData = parseDeadlineInput(userInput);
+        Deadline deadlineTask = new Deadline(deadlineData[0], deadlineData[1]);
+        return addTask(tasks, deadlineTask);
     }
 
     private static String[] parseEventInput(String userInput) throws GooseException {
@@ -175,8 +167,8 @@ public class GoGoGoose {
     }
 
     private static void handleDeleteCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
-        int index = parseTaskIndex(userInput, tasks, COMMAND_DELETE); // parse + validate
-        Task removedTask = tasks.remove(index); // remove task
+        int index = parseTaskIndex(userInput, tasks, COMMAND_DELETE);
+        Task removedTask = tasks.remove(index);
         saveTasksToFile(tasks);
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removedTask);
