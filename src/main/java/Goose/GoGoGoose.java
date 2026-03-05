@@ -16,8 +16,8 @@ public class GoGoGoose {
     private static final String COMMAND_EVENT = "event";
     private static final String FILE_PATH = "./data/goose.txt";
     private static final String COMMAND_DELETE = "delete";
-
-
+    private static final String COMMAND_FIND = "find";
+    
     private static final String DIVIDER_LINE =
             "____________________________________________________________";
 
@@ -176,6 +176,33 @@ public class GoGoGoose {
         System.out.println(DIVIDER_LINE);
     }
 
+    private static void handleFindCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
+        String keyword = userInput.substring(COMMAND_FIND.length()).trim();
+
+        if (keyword.isEmpty()) {
+            throw new GooseException("Quack!! Please provide a keyword to search.");
+        }
+
+        System.out.println("Here are the matching tasks in your list:");
+
+        int matchCount = 0;
+
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+
+            if (task.getDescription().contains(keyword)) {
+                matchCount++;
+                System.out.println(matchCount + "." + task);
+            }
+        }
+
+        if (matchCount == 0) {
+            System.out.println("No matching tasks found.");
+        }
+
+        System.out.println(DIVIDER_LINE);
+    }
+
     private static void handleCommand(String userInput, ArrayList<Task> tasks) throws GooseException {
         if (userInput.equals(COMMAND_LIST)) {
             handleListCommand(tasks);
@@ -189,9 +216,11 @@ public class GoGoGoose {
             handleDeadlineCommand(userInput, tasks);
         } else if (userInput.startsWith(COMMAND_EVENT)) {
             handleEventCommand(userInput, tasks);
-        }else if (userInput.startsWith(COMMAND_DELETE)) {
+        } else if (userInput.startsWith(COMMAND_DELETE)) {
             handleDeleteCommand(userInput, tasks);
-        }else {
+        } else if (userInput.startsWith(COMMAND_FIND)) {
+            handleFindCommand(userInput, tasks);
+        } else {
             throw new GooseException("Quack!! Type something that I can understand.");
         }
     }
