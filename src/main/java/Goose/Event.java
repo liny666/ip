@@ -23,9 +23,6 @@ public class Event extends Task {
         return to;
     }
 
-    public String getDescription() {
-        return super.toString().substring(3); // optional, or add in Task
-    }
 
 
 }

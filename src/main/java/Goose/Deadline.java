@@ -17,8 +17,5 @@ public class Deadline extends Task {
         return by;
     }
 
-    public String getDescription() {
-        return super.toString().substring(3);
-    }
 
 }
