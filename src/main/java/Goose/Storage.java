@@ -42,6 +42,10 @@ public class Storage {
                 if (line.isEmpty()) continue;
 
                 String[] parts = line.split(" \\| ");
+                if (parts.length < 3) {
+                    System.out.println("Warning: Malformed task line, skipping: " + line);
+                    continue;
+                }
                 String type = parts[0];
                 boolean isDone = parts[1].equals("1");
                 String description = parts[2];

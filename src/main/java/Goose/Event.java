@@ -4,8 +4,8 @@ package Goose;
  * Represents a task that occurs over a time range, with a start and end time.
  */
 public class Event extends Task {
-    protected String from;
-    protected String to;
+    private String from;
+    private String to;
 
     /**
      * Creates a new Event task with the given description and time range.

@@ -4,7 +4,7 @@ package Goose;
  * Represents a task that must be completed by a specific date or time.
  */
 public class Deadline extends Task {
-    protected String by;
+    private String by;
 
     /**
      * Creates a new Deadline task with the given description and due date.
