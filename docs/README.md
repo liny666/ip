@@ -6,9 +6,9 @@ GoGoGoose is a **command-line chatbot** that helps you manage your tasks. It sup
 
 ## Quick Start
 
-1. Ensure you have Java 11 or later installed.
-2. Download the latest `GoGoGoose.jar` from the releases page.
-3. Run it with: `java -jar GoGoGoose.jar`
+1. Ensure you have Java 17 or later installed.
+2. Download the latest `ip.jar` from the releases page.
+3. Run it with: `java -jar ip.jar`
 4. Type a command and press Enter.
 5. Type `bye` to exit.
 
