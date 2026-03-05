@@ -1,5 +1,8 @@
 package Goose;
 
+/**
+ * Parses raw user input strings into executable {@link Command} objects.
+ */
 public class Parser {
     private static final String COMMAND_BYE = "bye";
     private static final String COMMAND_LIST = "list";
@@ -11,6 +14,13 @@ public class Parser {
     private static final String COMMAND_DELETE = "delete";
     private static final String COMMAND_FIND = "find";
 
+    /**
+     * Parses the given user input and returns the corresponding Command.
+     *
+     * @param userInput The raw input string from the user.
+     * @return The Command corresponding to the input.
+     * @throws GooseException If the input does not match any known command.
+     */
     public static Command parse(String userInput) throws GooseException {
         if (userInput.equals(COMMAND_BYE)) {
             return new ExitCommand();
@@ -35,6 +45,14 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses a 1-based task number from the input and returns it as a 0-based index.
+     *
+     * @param userInput   The full user input string.
+     * @param commandName The command keyword, used in the error message.
+     * @return Zero-based index of the referenced task.
+     * @throws GooseException If no number is provided or the number is not valid.
+     */
     private static int parseIndex(String userInput, String commandName) throws GooseException {
         String[] parts = userInput.split(" ");
         if (parts.length < 2) {
@@ -47,14 +65,35 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses a {@code mark} command and returns a {@link MarkCommand}.
+     *
+     * @param userInput The full user input string.
+     * @return A MarkCommand with the parsed task index.
+     * @throws GooseException If the task number is missing or invalid.
+     */
     private static MarkCommand parseMarkCommand(String userInput) throws GooseException {
         return new MarkCommand(parseIndex(userInput, COMMAND_MARK));
     }
 
+    /**
+     * Parses an {@code unmark} command and returns an {@link UnmarkCommand}.
+     *
+     * @param userInput The full user input string.
+     * @return An UnmarkCommand with the parsed task index.
+     * @throws GooseException If the task number is missing or invalid.
+     */
     private static UnmarkCommand parseUnmarkCommand(String userInput) throws GooseException {
         return new UnmarkCommand(parseIndex(userInput, COMMAND_UNMARK));
     }
 
+    /**
+     * Parses a {@code todo} command and returns a {@link TodoCommand}.
+     *
+     * @param userInput The full user input string.
+     * @return A TodoCommand with the parsed description.
+     * @throws GooseException If the description is empty.
+     */
     private static TodoCommand parseTodoCommand(String userInput) throws GooseException {
         String description = userInput.substring(COMMAND_TODO.length()).trim();
         if (description.isEmpty()) {
@@ -63,6 +102,14 @@ public class Parser {
         return new TodoCommand(description);
     }
 
+    /**
+     * Parses a {@code deadline} command and returns a {@link DeadlineCommand}.
+     * Expected format: {@code deadline <description> /by <date>}
+     *
+     * @param userInput The full user input string.
+     * @return A DeadlineCommand with the parsed description and due date.
+     * @throws GooseException If the description or due date is missing.
+     */
     private static DeadlineCommand parseDeadlineCommand(String userInput) throws GooseException {
         String remaining = userInput.substring(COMMAND_DEADLINE.length()).trim();
         if (remaining.isEmpty()) {
@@ -81,6 +128,14 @@ public class Parser {
         return new DeadlineCommand(description, by);
     }
 
+    /**
+     * Parses an {@code event} command and returns an {@link EventCommand}.
+     * Expected format: {@code event <description> /from <start> /to <end>}
+     *
+     * @param userInput The full user input string.
+     * @return An EventCommand with the parsed description, start time, and end time.
+     * @throws GooseException If the description, start time, or end time is missing.
+     */
     private static EventCommand parseEventCommand(String userInput) throws GooseException {
         String remaining = userInput.substring(COMMAND_EVENT.length()).trim();
         if (remaining.isEmpty() || remaining.startsWith("/from") || remaining.startsWith("/to")) {
@@ -106,10 +161,24 @@ public class Parser {
         return new EventCommand(description, from, to);
     }
 
+    /**
+     * Parses a {@code delete} command and returns a {@link DeleteCommand}.
+     *
+     * @param userInput The full user input string.
+     * @return A DeleteCommand with the parsed task index.
+     * @throws GooseException If the task number is missing or invalid.
+     */
     private static DeleteCommand parseDeleteCommand(String userInput) throws GooseException {
         return new DeleteCommand(parseIndex(userInput, COMMAND_DELETE));
     }
 
+    /**
+     * Parses a {@code find} command and returns a {@link FindCommand}.
+     *
+     * @param userInput The full user input string.
+     * @return A FindCommand with the parsed search keyword.
+     * @throws GooseException If no keyword is provided.
+     */
     private static FindCommand parseFindCommand(String userInput) throws GooseException {
         String keyword = userInput.substring(COMMAND_FIND.length()).trim();
         if (keyword.isEmpty()) {
