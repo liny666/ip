@@ -1,5 +1,9 @@
 package Goose;
 
+/**
+ * The main class for the GoGoGoose task manager application.
+ * Initialises the UI, storage, and task list, then runs the main command loop.
+ */
 public class GoGoGoose {
     private static final String FILE_PATH = "./data/goose.txt";
 
@@ -7,6 +11,12 @@ public class GoGoGoose {
     private TaskList tasks;
     private Ui ui;
 
+    /**
+     * Creates a GoGoGoose instance, loading any previously saved tasks from the given file path.
+     * If the file cannot be loaded, starts with an empty task list.
+     *
+     * @param filePath The path to the file used for persistent task storage.
+     */
     public GoGoGoose(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -18,6 +28,9 @@ public class GoGoGoose {
         }
     }
 
+    /**
+     * Starts the main command loop, reading and executing user commands until exit.
+     */
     public void run() {
         ui.showWelcome();
         boolean isExit = false;
@@ -39,6 +52,11 @@ public class GoGoGoose {
         ui.close();
     }
 
+    /**
+     * Entry point of the application.
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         new GoGoGoose(FILE_PATH).run();
     }

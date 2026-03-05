@@ -5,13 +5,29 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Handles loading tasks from and saving tasks to a persistent file.
+ * The file uses a pipe-delimited format to represent each task.
+ */
 public class Storage {
     private String filePath;
 
+    /**
+     * Creates a Storage instance that reads from and writes to the given file path.
+     *
+     * @param filePath The path to the file used for persistent storage.
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * Loads tasks from the storage file and returns them as a list.
+     * Creates the file and its parent directory if they do not already exist.
+     *
+     * @return An ArrayList of tasks loaded from the file.
+     * @throws GooseException If the file cannot be read or parsed.
+     */
     public ArrayList<Task> load() throws GooseException {
         ArrayList<Task> tasks = new ArrayList<>();
         try {
@@ -62,6 +78,12 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Saves the given list of tasks to the storage file, overwriting any existing content.
+     * Silently prints a warning if the file cannot be written.
+     *
+     * @param tasks The list of tasks to save.
+     */
     public void save(ArrayList<Task> tasks) {
         try {
             File taskFile = new File(filePath);
