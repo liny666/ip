@@ -26,19 +26,19 @@ public class Parser {
             return new ExitCommand();
         } else if (userInput.equals(COMMAND_LIST)) {
             return new ListCommand();
-        } else if (userInput.startsWith(COMMAND_UNMARK + " ")) {
+        } else if (userInput.equals(COMMAND_UNMARK) || userInput.startsWith(COMMAND_UNMARK + " ")) {
             return parseUnmarkCommand(userInput);
-        } else if (userInput.startsWith(COMMAND_MARK + " ")) {
+        } else if (userInput.equals(COMMAND_MARK) || userInput.startsWith(COMMAND_MARK + " ")) {
             return parseMarkCommand(userInput);
-        } else if (userInput.startsWith(COMMAND_TODO + " ")) {
+        } else if (userInput.equals(COMMAND_TODO) || userInput.startsWith(COMMAND_TODO + " ")) {
             return parseTodoCommand(userInput);
-        } else if (userInput.startsWith(COMMAND_DEADLINE + " ")) {
+        } else if (userInput.equals(COMMAND_DEADLINE) || userInput.startsWith(COMMAND_DEADLINE + " ")) {
             return parseDeadlineCommand(userInput);
-        } else if (userInput.startsWith(COMMAND_EVENT + " ")) {
+        } else if (userInput.equals(COMMAND_EVENT) || userInput.startsWith(COMMAND_EVENT + " ")) {
             return parseEventCommand(userInput);
-        } else if (userInput.startsWith(COMMAND_DELETE + " ")) {
+        } else if (userInput.equals(COMMAND_DELETE) || userInput.startsWith(COMMAND_DELETE + " ")) {
             return parseDeleteCommand(userInput);
-        } else if (userInput.startsWith(COMMAND_FIND + " ")) {
+        } else if (userInput.equals(COMMAND_FIND) || userInput.startsWith(COMMAND_FIND + " ")) {
             return parseFindCommand(userInput);
         } else {
             throw new GooseException("Quack!! Type something that I can understand.");
